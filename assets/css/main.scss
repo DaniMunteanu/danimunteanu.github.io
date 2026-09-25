@@ -1,0 +1,19 @@
+---
+---
+
+@charset "utf-8";
+
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
+
+.page--no-sidebar {
+    float: none !important;
+  
+  .page__content{
+    width: auto !important;
+  }
+}
+
+.main--no-sidebar {
+  padding-inline: 0em !important;
+}
