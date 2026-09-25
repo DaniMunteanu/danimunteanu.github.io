@@ -31,9 +31,10 @@ github_username:  jekyll
 
 # Build settings
 github: [metadata]
-theme: minimal-mistakes-jekyll
-#remote_theme: pages-themes/cayman@v0.2.0
+#theme: minimal-mistakes-jekyll
+remote_theme: "mmistakes/minimal-mistakes@4.28.1"
 plugins:
+  - jekyll-include-cache
   - jekyll-remote-theme
   - jekyll-feed
 
