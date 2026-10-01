@@ -18,8 +18,14 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Daniel Munteanu
-email: dani.munteanu@gmail.com
+author:
+  name: "Daniel Munteanu"
+  email: "dani.munteanu.dm@gmail.com"
+  location: "Timisoara, Romania"
+  avatar: "/assets/images/avatar.jpg"
+  bio: "Salutare toata lumea eu sunt Daniel Munteanu"
+
+title: "Daniel Munteanu"
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
@@ -37,6 +43,12 @@ plugins:
   - jekyll-include-cache
   - jekyll-remote-theme
   - jekyll-feed
+  - jekyll-titles-from-headings
+
+titles_from_headings:
+  enabled:     true
+  strip_title: true
+  collections: true
 
 # Exclude from processing.
 # The following items will not be processed, by default.
@@ -50,6 +62,7 @@ plugins:
 include:
   - _pages
   - _layouts
+  - _includes
 
 # exclude:
 #   - .sass-cache/

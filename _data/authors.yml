@@ -1,0 +1,15 @@
+Daniel Munteanu:
+  name        : "Daniel Munteanu"
+  bio         : "Salutare toata lumea eu sunt Daniel Munteanu"
+  avatar      : "/assets/images/avatar.jpg"
+  fediverse   : "@danielmunteanu@instance.social"
+  links:
+    - label: "Email"
+      icon: "fas fa-fw fa-square-envelope"
+      url: "mailto:dani.munteanu.dm@gmail.com"
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://danielmunteanu.com"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-square-x-twitter"
+      url: "https://twitter.com/danielmunteanu"
