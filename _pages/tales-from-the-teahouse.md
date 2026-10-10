@@ -3,7 +3,7 @@ permalink: /projects/tales-from-the-teahouse
 layout: no-sidebar
 toc: true
 toc_sticky: true
-toc_label: "Tales from the Teahouse"
+toc_label: "Table of Contents"
 toc_icon: "cog"
 author_profile: false
 classes: no-sidebar
