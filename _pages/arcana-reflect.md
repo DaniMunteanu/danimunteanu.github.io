@@ -9,7 +9,35 @@ author_profile: false
 classes: no-sidebar
 ---
 
+# Arcana Reflect
+
+## Short Description
+
+This game started as an entry for the 
+<a href="https://rgda.ro/game-jam-universitar-2026/" target="_blank" rel="noopener noreferrer">2026 RGDA University Game Jam</a>.
+I worked on this project along with other 5 students with which I've never collaborated before.
+Despite this, development went smoothly and we even agreed to expand the game after the game jam ended.
+
+The result is a **2D (and 3D!) puzzle game** built using the **Godot** engine.
+The mechanics I implemented include:
+- Drag & Drop 2D puzzles
+- Inventory system
+- Puzzle progression tracking system using a notebook UI
+
+This project can also be found on 
+<a href="https://github.com/DaniMunteanu/Game-Jam-Game" target="_blank" rel="noopener noreferrer">Github</a> 
+and 
+<a href="https://biesbi.itch.io/arcana-reflect" target="_blank" rel="noopener noreferrer">itch.io</a> 
+
+## Gameplay Video
+
 {% include video id="JveU_W238AE" provider="youtube" %}
+
+## Download
+
+<iframe frameborder="0" src="https://itch.io/embed/4511997" width="552" height="167"><a href="https://biesbi.itch.io/arcana-reflect">Arcana Reflect by BiesBi, DaniMunteanu, Natalia Rosu, Lluke18, Willo_Flow, RaluAndreee, Dev Wizards</a></iframe>
+
+## Implemented Mechanics
 
 ```gdscript
 func on_try_snapping(painting_index: int):
@@ -36,5 +64,3 @@ func on_try_snapping(painting_index: int):
     else:
         paintings_snapped[painting_index] = -1
 ```
-
-<iframe frameborder="0" src="https://itch.io/embed-upload/19148763?color=ffffff" allowfullscreen="" width="1280" height="720"><a href="https://danimunteanu.itch.io/tales-from-the-teahouse">Play Tales From the Teahouse on itch.io</a></iframe>
