@@ -1,12 +1,12 @@
 ---
 permalink: /projects/arcana-reflect
-layout: no-sidebar
+layout: single
+author_profile: true
+author: Daniel Munteanu
 toc: true
 toc_sticky: true
 toc_label: "Table of Contents"
 toc_icon: "cog"
-author_profile: false
-classes: no-sidebar
 ---
 
 # Arcana Reflect
@@ -35,7 +35,9 @@ and
 
 ## Download
 
-<iframe frameborder="0" src="https://itch.io/embed/4511997" width="552" height="167"><a href="https://biesbi.itch.io/arcana-reflect">Arcana Reflect by BiesBi, DaniMunteanu, Natalia Rosu, Lluke18, Willo_Flow, RaluAndreee, Dev Wizards</a></iframe>
+<div class="itchio-widget-wrapper">
+    <iframe frameborder="0" src="https://itch.io/embed/4511997?bg_color=141010&amp;fg_color=ffffff&amp;link_color=f21368&amp;border_color=5d5d5d" width="552" height="167"><a href="https://biesbi.itch.io/arcana-reflect">Arcana Reflect by BiesBi, DaniMunteanu, Natalia Rosu, Lluke18, Willo_Flow, RaluAndreee, Dev Wizards</a></iframe>
+</div>
 
 ## Implemented Mechanics
 
