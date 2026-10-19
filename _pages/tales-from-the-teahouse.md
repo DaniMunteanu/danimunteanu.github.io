@@ -13,6 +13,23 @@ author: Daniel Munteanu
 
 ## Short Description
 
+This game is a **2D Unity** project developed in collaboration with 
+<a href="https://www.jamk.fi/en" target="_blank" rel="noopener noreferrer">Jamk University of Applied Sciences</a> through the <a href="https://eudres.eu/" target="_blank" rel="noopener noreferrer">EUDRES program</a>
+as a micro-internship experience.
+
+Our team was responsible for developing a teaser game promoting the Jamk University’s video-game therapy
+classes. The game is a visual novel focused on conversations with customers, with each character showcasing
+different topics addressed by the mindfulness program.
+
+My tasks included implementing some of the game’s core features:
+- Drag-and-drop ingredient system
+- Tooltips
+- Audio manager
+- Ingredients tracking and validation systems
+- Tutorial
+- The cup’s particle system
+- UI responsiveness
+
 This project can also be found on 
 <a href="https://github.com/DaniMunteanu/EudresInternship" target="_blank" rel="noopener noreferrer">Github</a> 
 and 
@@ -28,30 +45,154 @@ and
     <iframe frameborder="0" src="https://itch.io/embed/4857904?bg_color=141010&amp;fg_color=ffffff&amp;link_color=f21368&amp;border_color=5d5d5d" width="552" height="167"><a href="https://danimunteanu.itch.io/tales-from-the-teahouse">Tales From the Teahouse by DaniMunteanu, Bogdaain, 1Fearzz6, ruediuqqq, straw-berizz</a></iframe>
 </div>
 
-## Implemented Mechanics
+## Implemented Features
 
-```gdscript
-func on_try_snapping(painting_index: int):
-    var closest_marker_index = -1
-    var closest_distance = snap_max_distance
-    var painting_center = paintings[painting_index].global_position + paintings[painting_index].size / 2
+For smooth property transitions (such as objects floating up & down, or ingredients tilting), I used the
+<a href="https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676?srsltid=AU7gw4WbVe4ZEiEUYkE9oNRvV0iTxFwNZrUdbL50xA3_bV3zhEyFDKU1" target="_blank" rel="noopener noreferrer">DOTween asset</a> 
+from the **Unity Asset Store**.
 
-    for marker_index in range(markers.size()):
-        var dist = painting_center.distance_to(markers[marker_index].global_position)
-        if dist < closest_distance:
-            closest_distance = dist
-            closest_marker_index = marker_index
+### Draggable Ingredients
 
-    if closest_marker_index != -1:
-        if paintings_snapped.has(closest_marker_index) and paintings_snapped[painting_index] != closest_marker_index:
-            paintings_snapped[painting_index] = -1
-            return
-        paintings_snapped[painting_index] = closest_marker_index
-        paintings[painting_index].global_position = markers[closest_marker_index].global_position - paintings[painting_index].size / 2
-        #paintings[painting_index].global_position = markers[closest_marker_index].global_position
-        if closest_marker_index == painting_index:
-            TextManager.show_text(painting_descriptions[painting_index])
-        check_if_solved()
-    else:
-        paintings_snapped[painting_index] = -1
+In order to easily add/remove ingredients to our game, I stored their data inside Scriptable Objects. In the context of our game, each ingredient corresponds to their own list of _keywords_. These are also stored inside Scriptable Objects. The player's objective is to add all the ingriedients matching a list of required keywords.
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/ingredient-so.png" alt="Assigning Keywords to an Ingredient" caption="Assigning Keywords to an Ingredient" %}
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/draggable-ingredients-preview.gif" alt="Dragging and dropping an ingredient, with visual feedback" caption="Dragging and dropping an ingredient, with visual feedback" %}
+
+```csharp
+public class DraggableIngredient : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    [SerializeField] public Ingredient ingredientData;
+    //other variables...
+
+    //Start() method ...
+    //OnBeginDrag() method ...
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!isDraggable)
+            return;
+
+        RectTransform parentRect = rectTransform.parent as RectTransform;
+
+        // Update the position of the ingredient to follow the mouse cursor
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRect,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPoint))
+        {
+            rectTransform.anchoredPosition = localPoint;
+        }
+
+        //Check if the ingredient is over the cup, which implements the IDropArea interface
+        ingredientCollider.enabled = false;
+        Collider2D hitCollider = Physics2D.OverlapPoint(rectTransform.position);
+        ingredientCollider.enabled = true;
+
+        if (hitCollider != null && hitCollider.TryGetComponent<IDropArea>(out IDropArea dropArea))
+        {
+            // Rotate the ingredient clockwise by 45 degrees when over the cup
+            rectTransform.DORotate(new Vector3(0, 0, 45f), 0.2f)
+                .SetEase(Ease.InOutSine)
+                .SetLink(gameObject)
+                .SetUpdate(true);
+        }
+        else
+        {
+            // Rotate the ingredient back to its original rotation when not over the cup
+            rectTransform.DORotate(Vector3.zero, 0.2f)
+                .SetEase(Ease.InOutSine)
+                .SetLink(gameObject)
+                .SetUpdate(true);
+        }
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (!isDraggable)
+            return;
+
+        //Check if the ingredient is over the cup, which implements the IDropArea interface
+        ingredientCollider.enabled = false;
+        Collider2D hitCollider = Physics2D.OverlapPoint(rectTransform.position);
+        ingredientCollider.enabled = true;
+
+        if (hitCollider != null && hitCollider.TryGetComponent<IDropArea>(out IDropArea dropArea))
+        {
+            dropArea.OnIngredientDropped(ingredientData);
+        }
+
+        rectTransform.DOKill();
+
+        rectTransform.anchoredPosition = initialPosition;
+        rectTransform.rotation = initialRotation;
+    }
+}
+```
+
+### Ingredient and Keyword Tracking
+
+There are 3 ingredient types, and there is a limit of how many ingredients of the same type the player can add.
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/ingredient-type-so.png" alt="Assigning Keywords to an Ingredient" caption="Assigning Keywords to an Ingredient" %}
+
+If the ingredient added is of type _base_, the cup should "fill" up with a sprite. If the added ingredient is a _fruit_ or _addon_, then particles should be emitted from the cup. Below is a simplified version of the cup's script.
+
+```csharp
+public class Cup : MonoBehaviour, IDropArea
+{
+    [SerializeField] IngredientTracker ingredientTracker;
+
+    public void OnIngredientDropped(Ingredient ingredient)
+    {
+        // If this is the first "Base" ingredient being added, change the cup's filling image to the corresponding sprite
+        if (ingredient.ingredientType.typeName == "Base" && fillingImage.sprite == null)
+        {
+            fillingImage.sprite = ingredient.cupChangeSprite;
+            fillingImage.color = Color.white; // Make the image visible
+            fillingImage.SetNativeSize(); // Adjust the size of the image to match the sprite
+
+            frontFillingImage.sprite = ingredient.cupChangeSprite;
+            frontFillingImage.color = Color.white; // Make the image visible
+            frontFillingImage.SetNativeSize(); // Adjust the size of the image to match the sprite
+        }
+        
+        ingredientTracker.AddIngredient(ingredient);
+    }
+```
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/trackers.png" alt="Ingredients are tracked on the blackboard, and remaining keywords are displayed as bubbles" caption="Ingredients are tracked on the blackboard, and remaining keywords are displayed as bubbles" %}
+
+```csharp
+public void AddIngredient(Ingredient ingredient)
+{
+    if (IsIngredientValid(ingredient))
+    {
+        if (ingredient.name == "Biscuit")
+        {
+            // Instead of emitting particles, the biscuit will only be shown as a sprite next to the cup
+            teaParticles.ShowBiscuit();
+        }
+        else if (ingredient.ingredientType.typeName != "Base")
+        {
+            teaParticles.PlayParticles(ingredient.particleSprite);
+        }
+
+        ingredientTexts[currentIngredientIndex].text = ingredient.ingredientName;
+        currentIngredientIndex++;
+
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.ingredientDrop);
+
+        // Check if the added ingredient has any keywords that are in the requiredKeywords list
+        for (int i = 0; i < ingredient.keywords.Length; i++)
+        {
+            if (requiredKeywords.keywords.Contains(ingredient.keywords[i]))
+            {
+                KeywordsTracker.Instance.PopBubble(ingredient.keywords[i]);
+                break;
+            }
+        }
+    }
+}
 ```
