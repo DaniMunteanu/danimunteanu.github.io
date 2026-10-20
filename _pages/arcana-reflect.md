@@ -19,7 +19,7 @@ I worked on this project along with other 5 students with which I've never colla
 Despite this, development went smoothly and we even agreed to expand the game after the game jam ended.
 
 The result is a **2D (and 3D!) puzzle game** built using the **Godot** engine.
-The mechanics I implemented include:
+The features I implemented include:
 - Drag & Drop 2D puzzles
 - Inventory system
 - Puzzle progression tracking using a notebook UI

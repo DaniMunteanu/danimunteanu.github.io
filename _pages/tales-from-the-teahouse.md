@@ -137,6 +137,8 @@ There are 3 ingredient types, and there is a limit of how many ingredients of th
 
 {% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/ingredient-type-so.png" alt="Assigning Keywords to an Ingredient" caption="Assigning Keywords to an Ingredient" %}
 
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/particles-preview.gif" alt="Visual feedback upon adding ingredients" caption="Visual feedback upon adding ingredients" %}
+
 If the ingredient added is of type _base_, the cup should "fill" up with a sprite. If the added ingredient is a _fruit_ or _addon_, then particles should be emitted from the cup. Below is a simplified version of the cup's script.
 
 ```csharp
@@ -165,34 +167,193 @@ public class Cup : MonoBehaviour, IDropArea
 {% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/trackers.png" alt="Ingredients are tracked on the blackboard, and remaining keywords are displayed as bubbles" caption="Ingredients are tracked on the blackboard, and remaining keywords are displayed as bubbles" %}
 
 ```csharp
-public void AddIngredient(Ingredient ingredient)
+public class IngredientTracker : MonoBehaviour
 {
-    if (IsIngredientValid(ingredient))
+    [SerializeField] private KeywordGroup requiredKeywords;
+
+    public void AddIngredient(Ingredient ingredient)
     {
-        if (ingredient.name == "Biscuit")
+        if (IsIngredientValid(ingredient))
         {
-            // Instead of emitting particles, the biscuit will only be shown as a sprite next to the cup
-            teaParticles.ShowBiscuit();
-        }
-        else if (ingredient.ingredientType.typeName != "Base")
-        {
-            teaParticles.PlayParticles(ingredient.particleSprite);
-        }
-
-        ingredientTexts[currentIngredientIndex].text = ingredient.ingredientName;
-        currentIngredientIndex++;
-
-        AudioManager.Instance.PlaySFX(AudioManager.Instance.ingredientDrop);
-
-        // Check if the added ingredient has any keywords that are in the requiredKeywords list
-        for (int i = 0; i < ingredient.keywords.Length; i++)
-        {
-            if (requiredKeywords.keywords.Contains(ingredient.keywords[i]))
+            if (ingredient.name == "Biscuit")
             {
-                KeywordsTracker.Instance.PopBubble(ingredient.keywords[i]);
+                // Instead of emitting particles, the biscuit will only be shown as a sprite next to the cup
+                teaParticles.ShowBiscuit();
+            }
+            else if (ingredient.ingredientType.typeName != "Base")
+            {
+                teaParticles.PlayParticles(ingredient.particleSprite);
+            }
+
+            ingredientTexts[currentIngredientIndex].text = ingredient.ingredientName;
+            currentIngredientIndex++;
+
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.ingredientDrop);
+
+            // Check if the added ingredient has any keywords that are in the requiredKeywords list
+            for (int i = 0; i < ingredient.keywords.Length; i++)
+            {
+                if (requiredKeywords.keywords.Contains(ingredient.keywords[i]))
+                {
+                    KeywordsTracker.Instance.PopBubble(ingredient.keywords[i]);
+                    break;
+                }
+            }
+        }
+    }
+}
+```
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/keyword-group-so.png" alt="Required keywords are stored inside a Scriptable Object" caption="Required keywords are stored inside a Scriptable Object" %}
+
+We can use this Scriptable Object to add new keywords from a separate scene, such as the one used during dialogue. Everytime the player asks the NPC a question, a new keyword is added and is stored in the Scriptable Object to be displayed in the tea-preparation scene.
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/dialogue-preview.gif" alt="New keyword appears in the form of a bubble" caption="New keyword appears in the form of a bubble" %}
+
+```csharp
+public class DialogueManager : MonoBehaviour
+{
+    // Advances to the next question set or shows the make tea button if all sets are completed
+    void AdvanceToNextSet(Keyword keyword = null)
+    {
+        if (keyword != null)
+        {
+            KeywordsTracker.Instance.AddBubble(keyword);
+            //other lines of code...
+        }
+
+        currentSetIndex++;
+
+        if (currentSetIndex < TeaSession.CurrentRecipe.questionSets.Count)
+        {
+            clickToContinueOverlay.SetActive(true);
+        }
+        else
+        {
+            ShowMakeTeaButton();
+        }
+    }
+}
+```
+
+```csharp
+public class KeywordsTracker : MonoBehaviour
+{
+    [SerializeField] private KeywordGroup requiredKeywords;
+
+    public void AddBubble(Keyword keyword)
+    {
+        for (int index = 0; index < bubbles.Length; index++)
+        {
+            // Add the keyword to the first available bubble slot
+            if (bubbles[index].keyword == null)
+            {
+                requiredKeywords.keywords.Add(keyword);
+
+                bubbles[index].keyword = keyword;
+                bubbles[index].gameObject.SetActive(true);
+                bubbles[index].Float(); // Start floating animation for the new bubble
                 break;
             }
         }
+    }
+}
+```
+
+### Tooltips
+
+{% include figure popup=true image_path="/assets/images/tales-from-the-teahouse/tooltip.png" alt="Tooltip inside the Unity editor" caption="Tooltip inside the Unity editor" %}
+
+```csharp
+public class Tooltip : MonoBehaviour
+{
+    public void SetText(string titleContent, string detailsContent)
+    {
+        titleTextField.text = titleContent;
+        detailsTextField.text = detailsContent;
+        RefreshSize();
+    }
+
+    public void RefreshSize()
+    {
+        // Enable the layout element if the details text exceeds the preferred width
+        layoutElement.enabled = detailsTextField.preferredWidth >= layoutElement.preferredWidth;
+    }
+}
+```
+
+The tooltip's visibility and position is handled by a **TooltipManager**.
+
+```csharp
+public class TooltipManager : MonoBehaviour
+{
+    public void Show(string text, string details, string[] keywords, Vector3 position = default)
+    {
+        tooltip.keepPosition = false;
+        tooltip.SetText(text, details);
+        tooltip.gameObject.SetActive(true);
+
+        tooltip.GetComponent<RectTransform>().position = mainCamera.WorldToScreenPoint(position);
+    }
+}
+```
+
+A **TooltipTrigger** is the area where the player needs to hover/tap for the tooltip to be displayed.  
+
+```csharp
+public class TooltipTrigger : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+{
+    public void OnSelect(BaseEventData eventData)
+    {
+        if (isDragging)
+            return;
+        if (eventData is PointerEventData pointerEventData)
+        {
+            TooltipManager.Instance.Show(text, details, keywords, rectTransform.position);
+        }
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        TooltipManager.Instance.Hide();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // This ensures that the object can also be selected by touchscreen devices, which don't have a hover state
+        eventData.selectedObject = gameObject;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (eventData is ExtendedPointerEventData extendedPointerEventData)
+        {
+            // If the pointer event is from a touchscreen, do not show the tooltip
+            if (extendedPointerEventData.device is Touchscreen)
+            {
+                return;
+            }
+        }
+
+        // Don't show the tooltip while the object is being dragged
+        if (isDragging)
+            return;
+        
+        TooltipManager.Instance.Show(text, details, keywords, rectTransform.position);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (eventData is ExtendedPointerEventData extendedPointerEventData)
+        {   
+            // If the pointer event is from a touchscreen, do not hide the tooltip
+            if (extendedPointerEventData.device is Touchscreen)
+            {
+                return;
+            }
+        }
+
+        TooltipManager.Instance.Hide();
     }
 }
 ```
