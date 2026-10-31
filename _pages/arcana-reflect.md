@@ -25,8 +25,10 @@ The features I implemented include:
 - Puzzle progression tracking using a notebook UI
 
 This project can also be found on 
+<i class="fa-brands fa-github"></i>
 <a href="https://github.com/DaniMunteanu/Game-Jam-Game" target="_blank" rel="noopener noreferrer">Github</a> 
 and 
+<i class="fa-brands fa-itch-io"></i>
 <a href="https://biesbi.itch.io/arcana-reflect" target="_blank" rel="noopener noreferrer">itch.io</a> 
 
 ## Gameplay Video

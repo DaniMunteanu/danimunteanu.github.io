@@ -17,9 +17,7 @@ This **pixel-art tower-defense Unity** game is a personal project developed in t
 
 The premise is that a pirate crew needs to defend their treasure from G.U.M. (**G**ive **U**s **M**oney): a secret agency of tax collectors. After all, stolen treasure counts as "undeclared earnings"...
 
-The player needs to defend their treasure by placing pirates on a hexgrid to battle against enemy waves. Pirates can be upgraded, sold and even killed. For the moment, there is only one type of enenmy and only one playable type of pirate with 2 _mutually exclusive_ upgrades.
-
-However, I intend to continue working on this game for my dissertation project, focusing on adding more enemies, pirates and upgrades to increase replayability value.
+The player needs to defend their treasure by placing pirates on a hexgrid to battle against enemy waves. Pirates can be upgraded, sold and even killed. For the moment, there is only one type of enemy and only one playable type of pirate with 2 _mutually exclusive_ upgrades.
 
 Interesting features I implemented include:
 - Hexgrid placement system
@@ -27,8 +25,10 @@ Interesting features I implemented include:
 - Infinite scrolling background
 
 This project can also be found on 
+<i class="fa-brands fa-github"></i>
 <a href="https://github.com/DaniMunteanu/TaxInvasion" target="_blank" rel="noopener noreferrer">Github</a> 
 and 
+<i class="fa-brands fa-itch-io"></i>
 <a href="https://danimunteanu.itch.io/tax-invasion" target="_blank" rel="noopener noreferrer">itch.io</a> 
 
 ## Gameplay Video
@@ -220,3 +220,49 @@ public class WaveSpawner : MonoBehaviour
 ```
 
 ### Infinite Scrolling Background
+
+{% include figure popup=true image_path="/assets/images/tax-invasion/background-preview.gif" alt="Infinite background inside Unity's Scene View" caption="Infinite background inside Unity's Scene View" %}
+
+The background is composed of multiple elements, moving at different speeds.
+
+{% include figure popup=true image_path="/assets/images/tax-invasion/background.png" alt="Every background element has a duplicate next to it" caption="Every background element has a duplicate next to it" %}
+
+```csharp
+// Class of each "parent" element (containing the 2 duplicates)
+public class MoveBackground : MonoBehaviour
+{
+    [Range(0,1)]
+    public float scrollSpeed;
+    
+    // Update is called once per frame
+    void Update()
+    {
+        transform.Translate(Vector3.right * Time.deltaTime * scrollSpeed);
+    }
+}
+```
+
+```csharp
+// Class of each element
+public class BackgroundController : MonoBehaviour
+{
+    private float repeatWidth;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        // Get the width of the sprite to determine when to reset its position
+        repeatWidth = GetComponent<SpriteRenderer>().bounds.size.x;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(transform.position.x > repeatWidth)
+        {
+            // Reset the position of the background to create a seamless scrolling effect
+            transform.position = new Vector3(-repeatWidth, transform.position.y, transform.position.z);
+        }
+    }
+}
+```

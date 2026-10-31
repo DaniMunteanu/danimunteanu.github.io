@@ -25,8 +25,10 @@ The mechanics I implemented include:
 - Puzzle progression tracking system using a notebook UI
 
 This project can also be found on 
+<i class="fa-brands fa-github"></i>
 <a href="https://github.com/DaniMunteanu/DreamCatcher" target="_blank" rel="noopener noreferrer">Github</a> 
 and 
+<i class="fa-brands fa-itch-io"></i>
 <a href="https://danimunteanu.itch.io/dreamcatcher" target="_blank" rel="noopener noreferrer">itch.io</a> 
 
 ## Gameplay Video

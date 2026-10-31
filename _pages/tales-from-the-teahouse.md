@@ -31,8 +31,10 @@ My tasks included implementing some of the game’s core features:
 - UI responsiveness
 
 This project can also be found on 
+<i class="fa-brands fa-github"></i>
 <a href="https://github.com/DaniMunteanu/EudresInternship" target="_blank" rel="noopener noreferrer">Github</a> 
 and 
+<i class="fa-brands fa-itch-io"></i>
 <a href="https://danimunteanu.itch.io/tales-from-the-teahouse" target="_blank" rel="noopener noreferrer">itch.io</a> 
 
 ## Gameplay Video
