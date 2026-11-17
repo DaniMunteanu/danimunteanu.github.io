@@ -76,3 +76,9 @@ div.highlighter-rouge code {
 .clipboard-copy-button {
   color: #000000 !important;
 }
+
+.page__hero--overlay {
+  min-height: 90vh;
+  background-position: center;
+  background-size: cover;
+}

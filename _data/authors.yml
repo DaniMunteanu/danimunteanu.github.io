@@ -1,7 +1,7 @@
 Daniel Munteanu:
   name        : "Daniel Munteanu"
-  bio         : "Salutare toata lumea eu sunt Daniel Munteanu"
-  avatar      : "/assets/images/avatar.jpg"
+  bio         : "Passionate game developer with a Bachelor's degree in Computer Science"
+  avatar      : "/assets/images/profile/avatar.jpg"
   fediverse   : "@danielmunteanu@instance.social"
   links:
     - label: "Email"

@@ -23,6 +23,7 @@ feature_row:
     excerpt: "This is some sample content that goes here with **Markdown** formatting."
   - url: /projects/dreamcatcher
     image_path: /assets/images/dreamcatcher/cover.png
+    gif: /assets/images/dreamcatcher/preview.gif
     alt: "Dreamcatcher cover image"
     title: "Dreamcatcher"
     excerpt: "This is some sample content that goes here with **Markdown** formatting."
